@@ -2,43 +2,23 @@ import Square from "./Square";
 
 const Board = () => {
     let swapColor = 0;
-    let squareNum = 1;
+    let squareNum = 0;
 
     return (
         <div className="container px-5">
-            <div className="row w-75 mx-auto px-5">
-                <table className="mt-5">
-                    <tbody>
-                        {
-                            new Array(8).fill().map((e, idx) => {
-                                swapColor = !swapColor;
-                                return (
-                                    <tr key={idx}>
-                                        {
-                                            new Array(8).fill().map((e, idx) => {
-                                                let piece = "";
-                                                switch (squareNum) {
-                                                    case 1:
-                                                    case 8:
-                                                        piece = "rdt";
-                                                        break;
-                                                    case 57:
-                                                    case 64:
-                                                        piece = "rlt";
-                                                        break;
-                                                    default:
-                                                        break;
-                                                }
-                                                squareNum++;
-                                                return <Square dark={swapColor ? idx % 2 : (idx + 1) % 2} content={piece} key={squareNum}></Square>
-                                            })
-                                        }
-                                    </tr>
-                                )
-                            })
-                        }
-                    </tbody>
-                </table>
+            <div className="row col-md-8 col-lg-6 mx-auto">
+                {
+                    new Array(64).fill().map((e, idx) => {
+                        if (squareNum % 8 === 0)
+                            swapColor = !swapColor;
+                        squareNum++;
+                        return (
+                            <div className="box col-xs-8r p-0" key={idx}>
+                                <Square dark={swapColor ? idx % 2 : (idx + 1) % 2} squareNum={squareNum}></Square>
+                            </div>
+                        )
+                    })
+                }
             </div>
         </div>
     )

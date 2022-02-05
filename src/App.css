@@ -47,3 +47,12 @@
         float: left;
     }
 }
+
+.draggable {
+    cursor: pointer;
+}
+
+.onTop {
+    position: relative;
+    z-index: 10;
+}

@@ -14,6 +14,11 @@ import { ReactComponent as Rdt } from "../images/rdt.svg";
 
 const Square = (props) => {
 
+    let selected = false;
+    let node;
+    let offset;
+    let transform;
+
     const getPiece = () => {
         switch (props.squareNum) {
             case 1:
@@ -61,15 +66,71 @@ const Square = (props) => {
             case 49:
                 return <Plt></Plt>
             default:
-                return <Fragment></Fragment>
+                return null
         }
+    }
+
+    const startDrag = (e) => {
+        node = e.target.parentElement;
+        if (node.nodeName !== "g" || !node.classList.contains("draggable")) {
+            node = node.parentElement;
+        }
+        if (node.classList.contains("draggable") && !selected) {
+            selected = true;
+            document.onmousemove = drag;
+            offset = getMousePosition(e);
+            let transforms = node.parentElement.transform.baseVal;
+
+            if (transforms.length === 0 || transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) {
+                let translate = node.parentElement.createSVGTransform();
+                translate.setTranslate(0, 0);
+                node.parentElement.transform.baseVal.insertItemBefore(translate, 0);
+            }
+
+            transform = transforms.getItem(0);
+            offset.x -= transform.matrix.e;
+            offset.y -= transform.matrix.f;
+        }
+    }
+
+    const drag = (e) => {
+        if (selected) {
+            e.preventDefault();
+            let coord = getMousePosition(e);
+            transform.setTranslate(coord.x - offset.x, coord.y - offset.y);
+        }
+    }
+
+    const endDrag = (e) => {
+        if (selected) {
+            selected = false;
+            document.onmousemove = null;
+        }
+    }
+
+    const getMousePosition = (e) => {
+        if (e.touches) {
+            e = e.touches[0];
+        }
+        return {
+            x: e.clientX,
+            y: e.clientY
+        };
     }
 
     return (
         <Fragment>
             {
-                props.dark ? <div className="content w-100 h-100 bg-success text-light">{getPiece()}</div>
-                           : <div className="content w-100 h-100 bg-light text-dark">{getPiece()}</div>
+                props.dark ? <div className="content w-100 h-100 bg-success text-light">
+                                {
+                                    getPiece() !== null ? <svg className="onTop" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 45 45" preserveAspectRatio="xMidYMin slice" onMouseDown={(e) => startDrag(e)} onMouseMove={(e) => drag(e)} onMouseUp={(e) => endDrag(e)} onTouchStart={(e) => startDrag(e)} onTouchMove={(e) => drag(e)} onTouchEnd={(e) => endDrag(e)} onTouchCancel={(e) => endDrag(e)}>{getPiece()}</svg> : <Fragment></Fragment>
+                                }
+                            </div>
+                           : <div className="content w-100 h-100 bg-light text-dark">
+                                {
+                                    getPiece() !== null ? <svg className="onTop" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 45 45" preserveAspectRatio="xMidYMin slice" onMouseDown={(e) => startDrag(e)} onMouseMove={(e) => drag(e)} onMouseUp={(e) => endDrag(e)} onTouchStart={(e) => startDrag(e)} onTouchMove={(e) => drag(e)} onTouchEnd={(e) => endDrag(e)} onTouchCancel={(e) => endDrag(e)}>{getPiece()}</svg> : <Fragment></Fragment>
+                                }
+                            </div>
             }
         </Fragment>
     )

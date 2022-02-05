@@ -18,6 +18,7 @@ const Square = (props) => {
     let node;
     let offset;
     let transform;
+    let boardRect = document.querySelector(".row").getBoundingClientRect();
 
     const getPiece = () => {
         switch (props.squareNum) {
@@ -77,7 +78,7 @@ const Square = (props) => {
         }
         if (node.classList.contains("draggable") && !selected) {
             selected = true;
-            document.onmousemove = drag;
+            document.querySelector(".row").onmousemove = drag;
             offset = getMousePosition(e);
             let transforms = node.parentElement.transform.baseVal;
 
@@ -97,6 +98,15 @@ const Square = (props) => {
         if (selected) {
             e.preventDefault();
             let coord = getMousePosition(e);
+            while (boardRect.height === 0) {
+                boardRect = document.querySelector(".row").getBoundingClientRect();
+            }
+            
+            if (coord.x < boardRect.left) { coord.x = boardRect.left; }
+            if (coord.x > boardRect.right) { coord.x = boardRect.right; }
+            if (coord.y < boardRect.top) { coord.y = boardRect.top; }
+            if (coord.y > boardRect.bottom) { coord.y = boardRect.bottom; }
+
             transform.setTranslate(coord.x - offset.x, coord.y - offset.y);
         }
     }
@@ -104,7 +114,7 @@ const Square = (props) => {
     const endDrag = (e) => {
         if (selected) {
             selected = false;
-            document.onmousemove = null;
+            document.querySelector(".row").onmousemove = null;
         }
     }
 
